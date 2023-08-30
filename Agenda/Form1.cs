@@ -30,30 +30,43 @@ namespace Agenda
 
         }
 
+        //Função para inserir os dados no MySql
         private void btnSalvar_Click(object sender, EventArgs e)
         {
             try
             {
-                //Criar conexão com MySql
                 Conecxao = new MySqlConnection(data_source);
-
-                string sql = "INSERT INTO contato (nome, email, telefone) VALUES (' " + txtNome.Text + " ',' " + txtEmail.Text + " ', ' " + txtTelefone.Text + " ') ";
-
-                MySqlCommand comando = new MySqlCommand(sql, Conecxao);
 
                 Conecxao.Open();
 
-                comando.ExecuteReader();
+                MySqlCommand cmd = new MySqlCommand();
 
-                MessageBox.Show("Os dados foi salvo");
+                cmd.Connection = Conecxao;
 
-                //Ececutar o insert
+                cmd.CommandText = "INSERT INTO contato (nome, email, telefone) VALUES (@nome, @email, @telefone) ";
 
+                cmd.Parameters.AddWithValue("@nome", txtNome.Text);
+                cmd.Parameters.AddWithValue("@email", txtEmail.Text);
+                cmd.Parameters.AddWithValue("@telefone", txtTelefone.Text);
 
+                cmd.ExecuteNonQuery();
+
+                Conecxao.Close();
+
+                MessageBox.Show("Contato Inserido com Sucesso!",
+                                "Sucesso!", MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Erro: " + ex.Number + " Tipo do erro: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Erro: " + ex.Message);
             }
             finally
             {
@@ -61,6 +74,7 @@ namespace Agenda
             }
         }
 
+        //Buscar dados no MySql
         private void btnBuscar_Click(object sender, EventArgs e)
         {
             try
